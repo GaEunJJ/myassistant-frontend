@@ -39,7 +39,8 @@ export const streamChat = async (
     const lines = chunk.split("\n");
     for (const line of lines) {
       if (line.startsWith("data:")) {
-        onChunk(line.replace("data:", "").trim());
+        // "data:" 만 제거하고 trim 하지 않음 — LLM 토큰은 앞 공백이 단어 구분자
+        onChunk(line.replace(/^data:/, ""));
       }
     }
   }
