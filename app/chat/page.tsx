@@ -8,6 +8,7 @@ import { useChatStore } from "@/store/chatStore";
 import { streamChat } from "@/lib/api/chat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import DocumentUploadDialog from "@/components/DocumentUploadDialog";
 
 export default function ChatPage() {
   const router = useRouter();
@@ -60,6 +61,7 @@ export default function ChatPage() {
         <h1 className="text-lg font-semibold">My Assistant</h1>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">{username}</span>
+          <DocumentUploadDialog />
           <Button variant="outline" size="sm" onClick={handleLogout}>
             로그아웃
           </Button>

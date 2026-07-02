@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { SocialLoginButtons } from "@/components/SocialLoginButtons";
 
 const loginSchema = z.object({
   username: z.string().min(1, "아이디를 입력해주세요"),
@@ -82,6 +83,10 @@ export default function LoginPage() {
               {isSubmitting ? "로그인 중..." : "로그인"}
             </Button>
           </form>
+
+          <div className="mt-4">
+            <SocialLoginButtons />
+          </div>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             계정이 없으신가요?{" "}
