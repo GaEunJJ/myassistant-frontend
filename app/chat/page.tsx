@@ -13,8 +13,15 @@ import DocumentUploadDialog from "@/components/DocumentUploadDialog";
 export default function ChatPage() {
   const router = useRouter();
   const { isAuthenticated, username, logout } = useAuthStore();
-  const { messages, isStreaming, addUserMessage, startAssistantMessage, appendToLastMessage, setIsStreaming } =
-    useChatStore();
+  const {
+    messages,
+    isStreaming,
+    addUserMessage,
+    startAssistantMessage,
+    appendToLastMessage,
+    setSourcesForLastMessage,
+    setIsStreaming,
+  } = useChatStore();
 
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -43,6 +50,7 @@ export default function ChatPage() {
 
     await streamChat(
       trimmed,
+      (sources) => setSourcesForLastMessage(sources),
       // flushSync: 토큰마다 즉시 강제 렌더링하여 스트리밍 효과 구현
       (chunk) => flushSync(() => appendToLastMessage(chunk)),
       () => setIsStreaming(false)
@@ -97,6 +105,22 @@ export default function ChatPage() {
                   message === messages[messages.length - 1] && (
                     <span className="inline-block w-1 h-4 ml-0.5 bg-current animate-pulse" />
                   )}
+
+                {message.role === "assistant" && !!message.sources?.length && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-border/50 pt-2 text-xs text-muted-foreground">
+                    <span>출처:</span>
+                    {message.sources.map((source, index) => (
+                      <span
+                        key={`${source.filename}-${source.page}-${source.chunkIndex}-${index}`}
+                        className="rounded-full bg-background px-2 py-0.5"
+                      >
+                        {source.filename}
+                        {source.page != null && ` · ${source.page}페이지`}
+                        {source.chunkIndex != null && ` · 청크 ${source.chunkIndex + 1}`}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}

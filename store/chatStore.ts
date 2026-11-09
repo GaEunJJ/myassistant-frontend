@@ -1,9 +1,16 @@
 import { create } from "zustand";
 
+export interface SourceInfo {
+  filename: string;
+  page: number | null;
+  chunkIndex: number | null;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  sources?: SourceInfo[];
 }
 
 interface ChatState {
@@ -12,6 +19,7 @@ interface ChatState {
   addUserMessage: (content: string) => void;
   startAssistantMessage: () => string;
   appendToLastMessage: (chunk: string) => void;
+  setSourcesForLastMessage: (sources: SourceInfo[]) => void;
   setIsStreaming: (value: boolean) => void;
   clearMessages: () => void;
 }
@@ -49,6 +57,20 @@ export const useChatStore = create<ChatState>((set) => ({
           ...last,
           content: last.content + chunk,
         };
+      }
+      return { messages };
+    }),
+
+  /**
+   * 마지막 assistant 메시지에 출처(파일명/페이지/청크 순번 목록)를 반영한다.
+   * 출처 이벤트는 답변 토큰 스트리밍보다 먼저 도착하므로 빈 assistant 메시지에 바로 붙는다.
+   */
+  setSourcesForLastMessage: (sources) =>
+    set((state) => {
+      const messages = [...state.messages];
+      const last = messages[messages.length - 1];
+      if (last && last.role === "assistant") {
+        messages[messages.length - 1] = { ...last, sources };
       }
       return { messages };
     }),
